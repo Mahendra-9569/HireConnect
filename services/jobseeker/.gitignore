@@ -1,0 +1,60 @@
+# 🔐 Environment variables (VERY IMPORTANT)
+.env
+.env.*
+!.env.example
+
+# 📦 Node modules
+node_modules/
+
+# 🧾 Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 🛠️ Build folders
+dist/
+build/
+out/
+
+# 🧪 Coverage reports
+coverage/
+
+# 🧠 OS files
+.DS_Store
+Thumbs.db
+
+# 🧑‍💻 IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 🔄 Cache
+.cache/
+.parcel-cache/
+
+# 🔑 Keys & certificates
+*.pem
+*.key
+*.crt
+
+# 📁 Uploads / temp files
+uploads/
+tmp/
+temp/
+
+# 🧬 Next.js / React specific (optional)
+.next/
+.vercel/
+
+# 🧾 Debug files
+*.pid
+*.seed
+*.pid.lock
+
+# 📊 Misc
+*.csv
+*.dat

@@ -1,0 +1,60 @@
+# 🔐 Environment variables (VERY IMPORTANT)
+.env
+.env.*
+!.env.example
+
+# 📦 Node modules
+node_modules/
+
+# 🧾 Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 🛠️ Build folders
+dist/
+build/
+out/
+
+# 🧪 Coverage reports
+coverage/
+
+# 🧠 OS files
+.DS_Store
+Thumbs.db
+
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+
+.cache/
+.parcel-cache/
+
+
+*.pem
+*.key
+*.crt
+
+
+uploads/
+tmp/
+temp/
+
+
+.next/
+.vercel/
+
+
+*.pid
+*.seed
+*.pid.lock
+
+
+*.csv
+*.dat
