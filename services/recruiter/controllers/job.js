@@ -7,8 +7,6 @@ import Application from "../models/Application.js";
 import getBuffer from "../utils/buffer.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { TryCatch } from "../utils/TryCatch.js";
-import { applicationStatusUpdateTemplate } from "../template.js";
-import { publishToTopic } from "../producer.js";
 import { serializeCompany, serializeJob } from "../utils/serialize.js";
 
 const cloudinary = cloudinaryModule.v2;
@@ -125,6 +123,5 @@ export const updateApplication = TryCatch(async (req, res) => {
   if (!job) throw new ErrorHandler(404, "no job with this id");
   if (String(job.posted_by_recuriter_id) !== user.user_id) throw new ErrorHandler(403, "Forbidden you are not allowed");
   const updatedApplication = await Application.findByIdAndUpdate(req.params.id, { $set: { status: req.body.status } }, { new: true }).lean();
-  publishToTopic("send-mail", { to: application.applicant_email, subject: "Application Update - Job portal", html: applicationStatusUpdateTemplate(job.title) }).catch((error) => console.error("Failed to publish message to kafka", error));
   res.json({ message: "Application updated", job: serializeJob(job), updatedApplication: { ...updatedApplication, _id: updatedApplication._id.toString(), application_id: updatedApplication._id.toString() } });
 });
