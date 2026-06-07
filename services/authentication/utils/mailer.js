@@ -1,27 +1,32 @@
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const smtpUser = process.env.SMTP_USER?.trim();
+const smtpPass = process.env.SMTP_PASS?.trim();
+
+console.log("USER:", `"${smtpUser}"`); 
+console.log("PASS:", `"${smtpPass}"`);
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: process.env.EMAIL,
-        pass: process.env.APP_PASSWORD
+        user: smtpUser,
+        pass: smtpPass
     }
 });
 
-async function sendMail(to, otp) {
+const sendMail = async (email, otp) => {
     await transporter.sendMail({
-        from: process.env.EMAIL,
-        to,
-        subject: "Verify Your Account",
+        from: `"HireHeaven" <${smtpUser}>`, 
+        to: email?.trim(),
+        subject: "Verify Account",
         html: `
-        <div style="font-family: Arial;">
-            <h2>Account Verification</h2>
-            <p>Your OTP is:</p>
-            <h1 style="color:green">${otp}</h1>
-            <p>This OTP expires in 10 minutes</p>
-        </div>
+        <h2>OTP Verification</h2>
+        <h1>${otp}</h1>
         `
     });
-}
+};
 
 export default sendMail;

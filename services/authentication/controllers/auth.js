@@ -12,13 +12,12 @@ import { serializeUser } from "../utils/serialize.js";
 import sendMail from "../utils/mailer.js";
 
 
-
 export const registerUser = TryCatch(async (req, res) => {
     const { name, email, password, phoneNumber, role, bio } = req.body;
 
     if (!name || !email || !password || !phoneNumber || !role)
         throw new ErrorHandler(400, "Please fill all details");
-
+    
     let existingUser = await User.findOne({ email });
 
     if (existingUser?.isVerified)
@@ -26,9 +25,7 @@ export const registerUser = TryCatch(async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const otp = Math.floor(
-        100000 + Math.random() * 900000
-    ).toString();
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     const userData = {
         name,
@@ -42,53 +39,50 @@ export const registerUser = TryCatch(async (req, res) => {
         isVerified: false
     };
 
-
     if (role === "jobseeker") {
         if (!req.file)
-            throw new ErrorHandler(
-                400,
-                "Resume required"
-            );
+            throw new ErrorHandler(400, "Resume required");
 
         const buffer = getBuffer(req.file);
 
-        const { data } = await axios.post(
-            `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
-            { buffer }
-        );
-
-        userData.resume = data.url;
-        userData.resume_public_id = data.public_id;
-    }
-
+        // 🛠️ FIX 1: Wrap external API call to pinpoint microservice issues
+        try {
+            const { data } = await axios.post(
+                `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
+                { buffer } // Verify if your upload service expects { buffer } or FormData!
+            );
+            userData.resume = data.url;
+            userData.resume_public_id = data.public_id;
+        } catch (uploadError) {
+            console.error("Upload Service Failure:", uploadError.response?.data || uploadError.message);
+            throw new ErrorHandler(502, "File upload service failed. Please try again.");
+        }
+    } 
     else if (role !== "recruiter") {
-        throw new ErrorHandler(
-            400,
-            "Invalid role"
-        );
+        throw new ErrorHandler(400, "Invalid role");
     }
-
 
     let user;
-
     if (existingUser && !existingUser.isVerified) {
         Object.assign(existingUser, userData);
         user = await existingUser.save();
-    }
-
-    else {
+    } else {
         user = await User.create(userData);
     }
 
-
-    await sendMail(user.email, otp);
+    
+    try {
+        await sendMail(user.email, otp);
+    } catch (mailError) {
+        console.error("Mail Service Failure:", mailError.message);
+        throw new ErrorHandler(500, "Account created, but failed to send verification OTP.");
+    }
 
     res.status(201).json({
         success: true,
         message: "OTP sent successfully",
         email: user.email
     });
-
 });
 
 

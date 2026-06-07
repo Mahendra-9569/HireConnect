@@ -3,11 +3,11 @@ import axios from 'axios'
 const env = (key, fallback) => import.meta.env[key] || fallback
 
 export const API = {
-  auth: env('VITE_AUTH_API', 'https://hireconnect-authentication-service.onrender.com'),
-  user: env('VITE_USER_API', 'https://hireconnect-jobseeker-services.onrender.com'),
-  job: env('VITE_JOB_API', 'https://hireconnect-recruiter-services.onrender.com'),
-  interview: env('VITE_INTERVIEW_API', 'https://hireconnect-interviewreport-service.onrender.com'),
-  utils: env('VITE_UTILS_API', 'https://hireconnect-geminiresponse-services.onrender.com')
+  auth: env('VITE_AUTH_API', 'http://localhost:5000'),
+  user: env('VITE_USER_API', 'http://localhost:5002'),
+  job: env('VITE_JOB_API', 'http://localhost:5003'),
+  interview: env('VITE_INTERVIEW_API', 'http://localhost:3000'),
+  utils: env('VITE_UTILS_API', 'http://localhost:5001')
 }
 
 const TOKEN_KEY = 'hireheaven.token'

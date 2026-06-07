@@ -4,18 +4,19 @@
 
 ![HireConnect Banner](https://img.shields.io/badge/HireConnect-AI%20Job%20Portal-6366f1?style=for-the-badge&logo=briefcase&logoColor=white)
 
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev/)
-[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![Node.js](https://img.shields.io/badge/Node.js-Express%205-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
-[![Gemini AI](https://img.shields.io/badge/Gemini-2.5%20Flash-4285F4?style=flat-square&logo=google)](https://ai.google.dev/)
+[![Gemini AI](https://img.shields.io/badge/Google%20Gemini-2.5%20Flash-4285F4?style=flat-square&logo=google)](https://ai.google.dev/)
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-Media%20CDN-3448C5?style=flat-square&logo=cloudinary)](https://cloudinary.com/)
-[![Puppeteer](https://img.shields.io/badge/Puppeteer-PDF%20Generation-000000?style=flat-square&logo=puppeteer)](https://pptr.dev/)
-[![JWT](https://img.shields.io/badge/JWT-Authentication-000000?style=flat-square&logo=jsonwebtokens)](https://jwt.io/)
+[![Kafka](https://img.shields.io/badge/Apache%20Kafka-Event%20Bus-231F20?style=flat-square&logo=apachekafka)](https://kafka.apache.org/)
+[![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=flat-square&logo=jsonwebtokens)](https://jwt.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+[![Puppeteer](https://img.shields.io/badge/Puppeteer-PDF%20Gen-40B5A4?style=flat-square&logo=puppeteer)](https://pptr.dev/)
 
-
-**A production-grade, microservices-based job portal platform powered by AI — built for jobseekers, recruiters, and interview preparation. Features AI interview prep with Google Gemini 2.5 Flash, ATS resume analysis, career path suggestions, PDF generation with Puppeteer, and JWT + OTP-based authentication.**
-
-[🌐 Live Demo](https://github.com/Mahendra-9569/HireConnect) &nbsp;|&nbsp; [📖 API Docs](#api-reference) &nbsp;|&nbsp; [🐛 Report Bug](https://github.com/Mahendra-9569/HireConnect/issues) &nbsp;|&nbsp; [💡 Request Feature](https://github.com/Mahendra-9569/HireConnect/issues)
+**A production-grade, microservices-based job portal platform powered by Google Gemini AI.**  
+Built for jobseekers and recruiters. Features OTP-verified registration, JWT-based auth with token blacklisting, AI interview prep, ATS resume scoring, career path suggestions, and Puppeteer-based PDF resume generation — all split across 5 independently deployable backend services.**
 
 </div>
 
@@ -23,447 +24,590 @@
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Architecture Overview](#architecture-overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Microservices Breakdown](#microservices-breakdown)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Environment Variables](#environment-variables)
-  - [Running All Services](#running-all-services)
-- [API Reference](#api-reference)
-- [Database Schemas](#database-schemas)
-- [Authentication & Security Flow](#authentication--security-flow)
-- [AI Features Deep Dive](#ai-features-deep-dive)
-- [Frontend Routing & Pages](#frontend-routing--pages)
-- [Deployment Guide](#deployment-guide)
-- [Contributing](#contributing)
-- [Known Issues & Roadmap](#known-issues--roadmap)
-- [Author](#author)
+- [Overview](#-overview)
+- [Architecture](#️-architecture)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Microservices Breakdown](#-microservices-breakdown)
+- [Database Schemas](#-database-schemas)
+- [API Reference](#-api-reference)
+- [Frontend Pages & Routing](#-frontend-pages--routing)
+- [Authentication & Security Flow](#-authentication--security-flow)
+- [AI Features Deep Dive](#-ai-features-deep-dive)
+- [Environment Variables](#-environment-variables)
+- [Getting Started](#-getting-started)
+- [Deployment Notes](#-deployment-notes)
+- [Known Issues & Roadmap](#-known-issues--roadmap)
 
 ---
 
 ## 🧭 Overview
 
-**HireConnect** (internally named `hireheaven`) is a full-stack, production-grade job portal platform built on a **true microservices architecture**. Unlike monolithic job portals, every domain concern — authentication, job management, user profiles, AI tools, and email delivery 
+**HireConnect** (frontend package name: `hireheaven`) is a full-stack job portal built on a true **microservices architecture**. Each domain concern — authentication, user/jobseeker profiles, recruiter & job management, AI tooling, and file/email utilities — lives in its own independently runnable Node.js service, all consumed by a single React + Vite frontend.
 
-The platform serves two distinct user roles:
+The platform serves two distinct roles:
 
-- **Jobseekers** — Browse jobs, apply with one click (using their uploaded resume), track application status, get AI-generated interview reports, analyze their resume for ATS scores, and receive career path recommendations powered by Gemini AI.
-- **Recruiters** — Create and manage companies, post jobs, review all applications for each job, and update application statuses (Submitted → Hired / Rejected) with automated email notifications sent to applicants.
-
-All authentication uses **OTP-based email verification**, **JWT tokens** (15-day expiry), and a **token blacklist** system for secure logout.
+- **Jobseekers** — Register with OTP verification, upload a resume, browse and apply for jobs in one click, track application status, generate AI-powered interview prep reports, get ATS resume scores, and receive career path recommendations.
+- **Recruiters** — Create companies with logos, post and manage job listings, review all applicants per job, update application statuses (Submitted → Hired / Rejected) with automated email notifications sent via Kafka + Nodemailer.
 
 ---
 
-## 🏗️ Architecture Overview
+## 🏗️ Architecture
 
-HireConnect follows a **polyrepo-style microservices** design where each service owns its domain, its database connection, and its business logic. Services communicate synchronously via REST APIs and asynchronously via Kafka topics.
+HireConnect follows a **polyrepo-style microservices** design. Services own their data and business logic. Frontend communicates with each service directly over REST. Services communicate with each other synchronously (HTTP via Axios) or asynchronously (Apache Kafka for emails).
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                             HIRECONNECT PLATFORM                                 │
-├────────────────────────────────────┬─────────────────────────────────────────────┤
-│         FRONTEND (React + Vite)    │            MICROSERVICES LAYER               │
-│         Port: 5173                 │                                              │
-│                                    │  ┌─────────────────┐  Port 5000             │
-│  ┌────────────────────────┐        │  │  authentication  │ ─── MongoDB            │
-│  │     React Router DOM   │◄──────►│  │    service       │                       │
-│  │   (20+ pages/routes)   │        │  │                  │                       │
-│  └────────────────────────┘        │  └─────────────────┘                        │
-│                                    │                                              │
-│  ┌────────────────────────┐        │  ┌─────────────────┐  Port 5002             │
-│  │     AuthContext        │◄──────►│  │   jobseeker      │ ─── MongoDB            │
-│  │   (JWT + localStorage) │        │  │   service        │                        │
-│  └────────────────────────┘        │  └─────────────────┘                        │
-│                                    │                                              │
-│  ┌────────────────────────┐        │  ┌─────────────────┐  Port 5003             │
-│  │   5 Axios Instances    │◄──────►│  │   recruiter      │ ─── MongoDB            │
-│  │  (auth/user/job/       │        │  │   service        │                       │
-│  │   interview/utils)     │        │  └─────────────────┘ ─── Cloudinary         │
-│  └────────────────────────┘        │                                              │
-│                                    │  ┌─────────────────┐  Port 5001             │
-│                                    │  │  geminiResponse  │ ─── Cloudinary         │
-│                                    │  │  (utils) service │                        │
-│                                    │  │                  │     (send-mail topic)  │
-│                                    │  └─────────────────┘                        │
-│                                    │                                              │
-│                                    │  ┌─────────────────┐  Port 3000             │
-│                                    │  │ interviewReport  │ ─── MongoDB            │
-│                                    │  │   service        │ ─── Gemini AI          │
-│                                    │  │                  │ ─── Puppeteer (PDF)    │
-│                                    │  └─────────────────┘                        │
-│                                    │                                              │
-│                                    │  ┌─────────────────────────────────────────┐│
-│                                    │  │          INFRASTRUCTURE LAYER            ││
-│                                    │  │  Nodemailer   (event bus - send-mail)    ││
-│                                    │  │                                          ││
-│                                    │  │  MongoDB Atlas (per-service databases)   ││
-│                                    │  │  Cloudinary (resume + logo CDN)          ││
-│                                    │  └─────────────────────────────────────────┘│
-└────────────────────────────────────┴─────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                          HIRECONNECT PLATFORM                       │
+├─────────────────────────┬───────────────────────────────────────────┤
+│  FRONTEND               │  BACKEND MICROSERVICES                    │
+│  React + Vite           │                                           │
+│  Port: 5173             │  ┌──────────────────────┐  :5000          │
+│                         │  │  Authentication Svc   │──► MongoDB     │
+│  5 Axios instances      │  │  OTP, JWT, Blacklist  │──► Nodemailer  │
+│  (auth/user/job/        │  │  Cloudinary Upload    │──► Cloudinary  │
+│   interview/utils)      │  └──────────────────────┘                 │
+│                         │                                           │
+│  AuthContext            │  ┌──────────────────────┐  :5002          │
+│  ThemeContext           │  │  Jobseeker Svc        │──► MongoDB     │
+│  ProtectedRoute         │  │  Profile, Resume,     │──► Cloudinary  │
+│                         │  │  Skills, Apply, Apps  │                │
+│  20+ React Router       │  └──────────────────────┘                 │
+│  pages with role-       │                                           │
+│  based access           │  ┌──────────────────────┐  :5003          │
+│                         │  │  Recruiter Svc        │──► MongoDB     │
+│                         │  │  Companies, Jobs,     │──► Cloudinary  │
+│                         │  │  Applications, Kafka  │──► Kafka       │
+│                         │  └──────────────────────┘                 │
+│                         │                                           │
+│                         │  ┌──────────────────────┐  :5001          │
+│                         │  │  Utils/Gemini Svc     │──► Cloudinary  │
+│                         │  │  File upload,         │──► Gemini AI   │
+│                         │  │  Career advisor,      │──► Nodemailer  │
+│                         │  │  Resume ATS analyzer  │                │
+│                         │  └──────────────────────┘                 │
+│                         │                                           │
+│                         │  ┌──────────────────────┐  :3000          │
+│                         │  │  Interview Report Svc │──► MongoDB     │
+│                         │  │  AI interview prep,   │──► Gemini AI   │
+│                         │  │  PDF resume gen,      │──► Puppeteer   │
+│                         │  │  Zod schema output    │                │
+│                         │  └──────────────────────┘                 │
+│                         │                                           │
+│                         │  ┌──────────────────────────────────────┐ │
+│                         │  │  Apache Kafka (send-mail topic)      │ │
+│                         │  │  Recruiter Svc → publishes messages  │ │
+│                         │  │  Utils Svc → consumes & sends emails │ │
+│                         │  └──────────────────────────────────────┘ │
+└─────────────────────────┴───────────────────────────────────────────┘
 ```
 
-**Key Architectural Decisions:**
-- Each backend service has its **own MongoDB connection** and its own set of models — there is no shared database layer
-- **Apache Kafka** decouples email delivery: services publish to the `send-mail` topic, and the `geminiResponse` service (which also houses the Kafka consumer + Nodemailer transporter) handles sending, keeping SMTP logic isolated in one place
-- **Redis** stores short-lived password reset tokens (15-minute TTL) and prevents replay attacks
-- A **token blacklist** (MongoDB `BlackList` collection) ensures logout is truly effective even before the JWT expires
-- All file uploads (resumes, logos, profile pictures) are proxied through the **utils service** which handles Cloudinary CDN operations, keeping Cloudinary credentials out of multiple services
+### Inter-Service Communication
+
+| Type | Usage |
+|---|---|
+| **Synchronous REST (Axios)** | All services call the Utils service (`/api/utils/upload`) to upload files to Cloudinary |
+| **Asynchronous Kafka** | Recruiter service publishes to `send-mail` topic when an application status changes; Utils service consumes and sends the email |
 
 ---
 
 ## ✨ Features
 
-### 👤 Jobseeker Features
-| Feature | Description |
-|---|---|
-| **OTP-Verified Registration** | Email OTP sent via Kafka → Nodemailer; 10-minute expiry |
-| **Upload Resume on Signup** | PDF resume uploaded to Cloudinary during registration |
-| **Apply for Jobs** | One-click apply using saved resume; duplicate application prevention |
-| **Track Applications** | View all applications with job title, salary, location, and status |
-| **Profile Management** | Update name, bio, phone number; update profile picture; update resume |
-| **Skills Management** | Add and delete skills from profile |
-| **AI Interview Studio** | Upload resume + job description → get a full AI-generated interview prep report |
-| **Interview Report** | Match score, technical questions + answers, behavioral questions, skill gap analysis, day-wise preparation plan |
-| **AI Resume Analyzer** | Upload PDF resume → receive ATS score breakdown (formatting, keywords, structure, readability) + improvement suggestions |
-| **AI Career Advisor** | Enter skills → receive career path suggestions, job options, skill recommendations |
-| **Download AI Resume PDF** | AI generates a job-tailored, ATS-friendly resume in HTML → converted to PDF via Puppeteer |
-| **Dark / Light Theme** | Persistent theme preference stored in localStorage |
+### For Jobseekers
+- OTP-verified registration with resume upload
+- One-click job apply (uses stored resume URL)
+- Subscription-aware application prioritization
+- Profile management: bio, phone, profile picture, resume replacement
+- Skills management (add / remove)
+- Application tracker with job title, salary, location, and status
+- **AI Interview Studio** — upload resume + job description → get match score, technical questions, behavioral questions, skill gaps, and a day-wise preparation plan
+- **ATS Resume Analyzer** — upload PDF → get ATS score, formatting/keywords/structure/readability breakdown, and prioritized suggestions
+- **Career Advisor** — enter your skills → get job role options, skills to learn, and learning approach advice
 
-### 🏢 Recruiter Features
-| Feature | Description |
-|---|---|
-| **Company Management** | Create, view, and delete companies with logo upload |
-| **Job Posting** | Post jobs with title, description, salary, location, type, work location, role, and openings count |
-| **Job Updates** | Edit existing job listings (toggle active/inactive, update details) |
-| **Application Review** | View all applicants for each job, sorted by subscription status |
-| **Application Status Update** | Change application status (Submitted → Hired / Rejected); applicant is emailed automatically |
-| **Company Details** | View all jobs associated with a company |
+### For Recruiters
+- Company management: create (with logo), view, delete (cascades jobs + applications)
+- Job posting with title, salary, location, role, type, work mode, and openings count
+- Job toggle (active/inactive), full edit support
+- Per-job applicant list with subscription priority sorting
+- Application status updates (Submitted / Hired / Rejected) with automatic email notification to applicant
 
-### 🔐 Authentication & Security
-| Feature | Description |
-|---|---|
-| **OTP Email Verification** | 6-digit OTP, 10-minute expiry, sent via Kafka async pipeline |
-| **JWT Authentication** | 15-day token, `Authorization: Bearer` header |
-| **Password Reset** | Secure reset link emailed via Kafka; token stored in Redis with 15-minute TTL |
-| **Token Blacklist** | Logout invalidates the token by storing it in MongoDB `BlackList` collection |
-| **Role-Based Access Control** | Routes and API endpoints protected by `jobseeker` / `recruiter` role |
+### Platform-Wide
+- Dark / Light theme toggle with system preference detection and smooth CSS transitions
+- Role-based protected routes (jobseeker-only, recruiter-only, both)
+- JWT token blacklisting for secure server-side logout
+- Centralized error handling and TryCatch wrapper pattern across all services
+- Multer-based file upload with base64 buffer forwarding to Cloudinary
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
-### Frontend (`/frontend`)
-| Technology | Version | Purpose |
-|---|---|---|
-| **React** | 19 | UI framework |
-| **Vite** | Latest | Build tool and dev server |
-| **Tailwind CSS** | 3 | Utility-first CSS |
-| **React Router DOM** | 7 | Client-side routing with protected routes |
-| **Axios** | Latest | HTTP client (5 separate instances per service) |
-| **React Hot Toast** | Latest | Toast notifications |
-| **Lucide React** | Latest | Icon library |
-| **AuthContext** | Custom | Global auth state (JWT + user object) |
-| **ThemeContext** | Custom | Dark/light theme management |
-
-### Backend Services
+### Frontend
 | Technology | Purpose |
 |---|---|
-| **Node.js + Express.js** | REST API framework for all services |
-| **MongoDB + Mongoose** | Primary database (Atlas, shared cluster, separate DBs) |
-| **Apache Kafka (KafkaJS)** | Async event bus for email delivery |
-| **Redis (ioredis)** | Password reset token cache (TTL-based) |
-| **JWT (jsonwebtoken)** | Stateless authentication (15-day expiry) |
-| **bcryptjs** | Password hashing (10 salt rounds) |
-| **Cloudinary** | Resume, profile pic, company logo CDN |
-| **Multer** | Multipart file parsing before Cloudinary upload |
-| **Nodemailer** | SMTP email via Gmail (port 465, SSL) |
-| **Google Gemini 2.5 Flash** | AI career advisor + ATS resume analyzer |
-| **Google Gemini 3 Flash** | AI interview report + resume PDF generation |
-| **Zod + zod-to-json-schema** | Structured AI output schema enforcement |
-| **Puppeteer** | Headless Chrome for PDF generation from HTML |
-| **pdf-parse** | Extract text from uploaded PDF resumes |
-| **Docker** | Each service has its own `Dockerfile` |
+| React 18 | UI framework |
+| Vite 7 | Build tool and dev server |
+| React Router DOM v6 | Client-side routing |
+| Tailwind CSS 3 | Utility-first styling |
+| Axios | HTTP client (5 independent instances) |
+| Lucide React | Icon library |
+| React Hot Toast | Toast notifications |
+| clsx | Conditional class names |
 
----
-
-## 📦 Microservices Breakdown
-
-### 1. 🔐 Authentication Service — Port `5000`
-**Responsibility:** User registration, login, OTP verification, password reset, logout.
-
-| Feature | Details |
+### Backend (per service)
+| Technology | Purpose |
 |---|---|
-| Registration | Accepts role (`jobseeker` / `recruiter`), hashes password, generates 6-digit OTP, sends via Kafka |
-| Jobseeker signup | Also uploads resume PDF to Cloudinary via utils service |
-| OTP Verification | Validates OTP + expiry, marks `isVerified: true`, issues JWT |
-| Login | bcrypt compare, issues JWT (15d), returns serialized user |
-| Forgot Password | Generates reset JWT, stores in Redis (15min TTL), sends link via Kafka |
-| Reset Password | Verifies JWT type + Redis token match, updates password hash |
-| Logout | Adds token to MongoDB `BlackList` collection |
-| Kafka | Produces to `send-mail` topic; creates topic if not found on startup |
-
----
-
-### 2. 👤 Jobseeker Service — Port `5002`
-**Responsibility:** User profile management, job application, skills management.
-
-| Feature | Details |
-|---|---|
-| My Profile | Returns authenticated user object |
-| Update Profile | Name, phone, bio |
-| Update Profile Pic | Uploads to Cloudinary via utils service (replaces old image) |
-| Update Resume | Uploads PDF to Cloudinary, replaces old resume |
-| Add/Delete Skills | Manages `skills[]` array on User document |
-| Apply for Job | Creates Application (enforces unique index on `job_id + applicant_id`), checks subscription for priority ordering |
-| My Applications | MongoDB aggregation pipeline: joins Applications → Jobs → returns enriched data |
-
----
-
-### 3. 🏢 Recruiter Service — Port `5003`
-**Responsibility:** Company management, job posting, application review and status management.
-
-| Feature | Details |
-|---|---|
-| Create Company | Role-guarded (`recruiter` only), uploads logo to Cloudinary |
-| Delete Company | Cascading delete: removes company logo from Cloudinary, deletes all associated jobs and applications |
-| Create Job | Links to company via `company_id`, validates recruiter ownership |
-| Update Job | Ownership check on `posted_by_recruiter_id` before allowing edit |
-| Get All Active Jobs | Filter by title/location (case-insensitive regex), joins company name + logo |
-| Get All Applications | Sorted by subscription status (subscribed applicants shown first), then by date |
-| Update Application Status | Updates status, publishes email notification to Kafka topic |
-
----
-
-### 4. 🤖 GeminiResponse / Utils Service — Port `5001`
-**Responsibility:** Cloudinary uploads, Gemini AI career advisor, ATS resume analyzer, AND Kafka email consumer.
-
-| Feature | Details |
-|---|---|
-| File Upload | Accepts base64-encoded buffer, optionally deletes old Cloudinary asset, returns `secure_url` + `public_id` |
-| Career Advisor | Takes skills string → structured Gemini 2.5 Flash prompt → returns JSON (summary, job options, skills to learn, learning approach) |
-| ATS Resume Analyzer | Takes PDF base64 → Gemini 2.5 Flash multimodal analysis → returns JSON (ATS score, score breakdown, suggestions, strengths) |
-| Kafka Consumer | Subscribes to `send-mail` topic, parses messages, sends via Nodemailer Gmail SMTP (port 465 SSL) |
-
----
-
-### 5. 📋 InterviewReport Service — Port `3000`
-**Responsibility:** AI-powered interview preparation reports and AI resume PDF generation.
-
-| Feature | Details |
-|---|---|
-| Generate Interview Report | Parses uploaded PDF resume with `pdf-parse`, sends to Gemini 3 Flash with Zod schema enforcement |
-| Report Contents | Match score (0-100), technical Q&A, behavioral Q&A, skill gap analysis (severity: low/medium/high), day-wise prep plan |
-| Get All Reports | Returns all reports for the authenticated user (excludes large text fields for listing) |
-| Get Single Report | Full report details by ID |
-| Generate Resume PDF | Fetches saved report, sends to Gemini 3 Flash to generate ATS-optimized HTML resume → Puppeteer renders to PDF → returned as binary download |
+| Node.js + Express 5 | HTTP server framework |
+| MongoDB + Mongoose | Database and ODM |
+| JWT (jsonwebtoken) | Access token auth (15-day expiry) |
+| bcryptjs | Password hashing (salt rounds: 10) |
+| Multer | File upload middleware |
+| Cloudinary SDK | Media/file CDN storage |
+| Axios | Inter-service HTTP calls |
+| Nodemailer | Transactional email via Gmail SMTP |
+| KafkaJS | Event streaming for async email delivery |
+| Google Gemini AI (`@google/genai`) | AI generation (gemini-2.5-flash / gemini-3-flash-preview) |
+| Puppeteer | Headless browser for PDF generation |
+| pdf-parse | Server-side PDF text extraction |
+| Zod + zod-to-json-schema | Structured AI response schema enforcement |
+| dotenv | Environment variable management |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-myProject/
-├── frontend/                            # React + Vite client app
+hireConnect/
+├── frontend/                         # React + Vite SPA
 │   ├── src/
 │   │   ├── api/
-│   │   │   └── client.js                # 5 Axios instances + session helpers
+│   │   │   └── client.js             # 5 Axios instances, session helpers, base64 util
 │   │   ├── components/
-│   │   │   ├── Layout.jsx               # App shell wrapper
-│   │   │   ├── Navbar.jsx               # Responsive nav (role-aware)
-│   │   │   ├── ProtectedRoute.jsx       # Auth + role guard
-│   │   │   ├── UI.jsx                   # Shared UI components
-│   │   │   └── JsonTree.jsx             # JSON visualizer component
+│   │   │   ├── JsonTree.jsx           # Recursive JSON tree renderer
+│   │   │   ├── Layout.jsx             # App shell wrapper
+│   │   │   ├── Navbar.jsx             # Top nav with auth state + theme toggle
+│   │   │   ├── ProtectedRoute.jsx     # Role-based route guard
+│   │   │   └── UI.jsx                 # Reusable UI primitives
 │   │   ├── context/
-│   │   │   ├── AuthContext.jsx          # JWT auth state, login/logout, refreshMe
-│   │   │   └── ThemeContext.jsx         # Dark/light theme with localStorage persistence
+│   │   │   ├── AuthContext.jsx        # JWT session, login/logout, refreshMe
+│   │   │   └── ThemeContext.jsx       # Dark/light theme with system detection
 │   │   ├── pages/
-│   │   │   ├── Home.jsx                 # Landing page (role-aware CTAs)
-│   │   │   ├── AuthPages.jsx            # Login, Register, Verify OTP, Forgot, Reset
-│   │   │   ├── JobsPages.jsx            # Browse Jobs, Job Details, Company Details
-│   │   │   ├── UserPages.jsx            # Dashboard, Profile, Applications, Public Profile
-│   │   │   ├── RecruiterPages.jsx       # Company mgmt, Job mgmt, Application review
-│   │   │   ├── InterviewAndToolsPages.jsx # Interview Studio, Report View, Career Tools, ATS
-│   │   │   └── NotFound.jsx             # 404 page
-│   │   ├── utils/format.js              # Date/salary formatting helpers
-│   │   ├── App.jsx                      # Router with AnimatedRoutes
-│   │   └── main.jsx                     # Entry point
-│   ├── .env
+│   │   │   ├── AuthPages.jsx          # Login, Register, Verify OTP
+│   │   │   ├── Home.jsx               # Landing page
+│   │   │   ├── JobsPages.jsx          # Job list, job detail, company detail
+│   │   │   ├── UserPages.jsx          # Dashboard, profile, applications, public profile
+│   │   │   ├── RecruiterPages.jsx     # Companies, create company/job, recruiter apps
+│   │   │   ├── InterviewAndToolsPages.jsx  # Interview studio, report, career, ATS
+│   │   │   └── NotFound.jsx           # 404 page
+│   │   ├── utils/
+│   │   │   └── format.js              # Date/number formatting helpers
+│   │   ├── App.jsx                    # Root router + provider composition
+│   │   ├── main.jsx                   # React DOM entry point
+│   │   └── index.css                  # Global styles + Tailwind directives
+│   ├── .env                           # VITE_ API base URLs
+│   ├── package.json
+│   ├── vite.config.js
 │   ├── tailwind.config.js
-│   └── vite.config.js
+│   └── postcss.config.js
 │
 └── services/
-    ├── authentication/                  # Auth microservice (Port 5000)
-    │   ├── controllers/auth.js          # registerUser, verifyOTP, loginUser, forgotPassword, resetPassword, logoutUser
-    │   ├── models/User.js + BlackList.js
-    │   ├── routes/auth.js
-    │   ├── middleware/multer.js
-    │   ├── utils/ (redis, TryCatch, errorHandler, serialize, buffer)
-    │   ├── producer.js                  # Kafka producer
-    │   ├── template.js                  # Email HTML templates
-    │   ├── app.js + index.js
-    │   └── Dockerfile
-    │
-    ├── jobseeker/                       # Jobseeker microservice (Port 5002)
-    │   ├── controllers/user.js
-    │   ├── models/ (User, Job, Application)
-    │   ├── routes/user.js
-    │   ├── middlewares/ (auth, multer)
+    ├── authentication/               # Port 5000 — Auth Service
+    │   ├── controllers/auth.js        # register, verifyOTP, login, logout
+    │   ├── middleware/multer.js        # File upload middleware
+    │   ├── models/
+    │   │   ├── User.js                # User schema with OTP fields
+    │   │   └── BlackList.js           # Token blacklist schema
+    │   ├── routes/auth.js             # /api/auth routes
     │   ├── utils/
-    │   ├── app.js + index.js
+    │   │   ├── buffer.js              # File → base64 buffer helper
+    │   │   ├── db.js                  # MongoDB connection
+    │   │   ├── errorHandler.js        # Custom ErrorHandler class
+    │   │   ├── mailer.js              # Nodemailer Gmail SMTP
+    │   │   ├── serialize.js           # serializeUser output shaper
+    │   │   └── TryCatch.js            # Async error wrapper HOF
+    │   ├── app.js                     # Express app with CORS
+    │   ├── index.js                   # Server entry + DB connect
     │   └── Dockerfile
     │
-    ├── recruiter/                       # Recruiter microservice (Port 5003)
-    │   ├── controllers/job.js
-    │   ├── models/ (Company, Job, Application, User)
-    │   ├── routes/job.js
-    │   ├── producer.js                  # Kafka producer for status emails
-    │   ├── template.js
-    │   ├── utils/ (serialize, TryCatch, errorHandler, buffer, db)
-    │   ├── app.js + index.js
-    │   └── Dockerfile
+    ├── jobseeker/                    # Port 5002 — Jobseeker/User Service
+    │   ├── controllers/user.js        # profile, updateProfile, skills, apply, applications
+    │   ├── middlewares/
+    │   │   ├── auth.js                # JWT verify + blacklist check
+    │   │   └── multer.js
+    │   ├── models/
+    │   │   ├── User.js
+    │   │   ├── Job.js                 # Read-only mirror of Job schema
+    │   │   ├── Application.js         # Application schema
+    │   │   └── BlackList.js
+    │   ├── routes/user.js             # /api/user routes
+    │   └── utils/ (buffer, db, errorHandler, serialize, TryCatch)
     │
-    ├── geminiResponse/                  # Utils + AI + Mail service (Port 5001)
-    │   ├── routes.js                    # /upload, /career, /resume-analyser
-    │   ├── consumer.js                  # Kafka consumer → Nodemailer
-    │   ├── app.js + index.js
-    │   └── Dockerfile
+    ├── recruiter/                    # Port 5003 — Recruiter/Job Service
+    │   ├── controllers/job.js         # company CRUD, job CRUD, application management
+    │   ├── middlewares/
+    │   │   ├── auth.js                # JWT verify + role check
+    │   │   └── multer.js
+    │   ├── models/
+    │   │   ├── Company.js             # Company schema
+    │   │   ├── Job.js                 # Job schema (full write model)
+    │   │   ├── Application.js
+    │   │   ├── User.js
+    │   │   └── BlackList.js
+    │   ├── routes/job.js              # /api/job routes
+    │   ├── producer.js                # Kafka producer (send-mail topic)
+    │   ├── template.js                # HTML email template for status updates
+    │   └── utils/ (buffer, db, errorHandler, serialize, TryCatch)
     │
-    └── interviewReport/                 # Interview AI service (Port 3000)
+    ├── geminiResponse/               # Port 5001 — Utils/AI Service
+    │   ├── routes.js                  # /upload, /career, /resume-analyser
+    │   ├── app.js                     # Express app (50mb JSON limit)
+    │   └── index.js                   # Server entry
+    │
+    └── interviewReport/              # Port 3000 — Interview Report Service
         ├── src/
-        │   ├── services/ai.service.js   # Gemini + Puppeteer
-        │   ├── controllers/interview.controller.js
-        │   ├── models/interviewReport.model.js
-        │   ├── routes/interview.routes.js
-        │   ├── middlewares/ (auth, file)
-        │   └── config/database.js
-        └── server.js
+        │   ├── app.js                 # Express app
+        │   ├── config/database.js     # MongoDB connection
+        │   ├── controllers/
+        │   │   └── interview.controller.js   # generate, getById, getAll, generatePdf
+        │   ├── middlewares/
+        │   │   ├── auth.middleware.js  # JWT verify (CommonJS)
+        │   │   └── file.middleware.js  # Multer (memory storage)
+        │   ├── models/
+        │   │   └── interviewReport.model.js  # Full report schema with sub-docs
+        │   ├── routes/
+        │   │   └── interview.routes.js
+        │   └── services/
+        │       └── ai.service.js      # Gemini AI calls + Puppeteer PDF gen
+        └── server.js                  # Entry point
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🗄 Database Schemas
 
-### Prerequisites
+All services connect to the same **MongoDB Atlas cluster** (`MicroservicesDB`) but own their models independently.
 
-| Requirement | Version | Notes |
+### User (auth + jobseeker + recruiter services)
+```
+User {
+  name:                 String (required)
+  email:                String (required, unique, indexed)
+  password:             String (required, bcrypt hashed)
+  phone_number:         String (required)
+  role:                 "jobseeker" | "recruiter"
+  bio:                  String (nullable)
+  resume:               String (Cloudinary URL, nullable)
+  resume_public_id:     String (Cloudinary public_id, nullable)
+  profile_pic:          String (Cloudinary URL, nullable)
+  profile_pic_public_id:String (nullable)
+  subscription:         Date (nullable — expiry date for priority sorting)
+  skills:               [String]
+  isVerified:           Boolean (default: false)
+  otp:                  String (nullable, 6-digit, 10-min TTL)
+  otpExpires:           Date (nullable)
+  created_at:           Date (auto)
+}
+```
+
+### Company (recruiter service)
+```
+Company {
+  name:             String (required, unique, indexed)
+  description:      String (required)
+  website:          String (required)
+  logo:             String (Cloudinary URL, required)
+  logo_public_id:   String (required)
+  recruiter_id:     ObjectId → User (required)
+  created_at:       Date (auto)
+}
+```
+
+### Job (recruiter + jobseeker services)
+```
+Job {
+  title:                     String (required)
+  description:               String (required)
+  salary:                    Number (nullable)
+  location:                  String (nullable)
+  job_type:                  String (required)  — e.g. "Full-time"
+  openings:                  Number (required)
+  role:                      String (required)  — e.g. "Backend Engineer"
+  work_location:             String (required)  — e.g. "Remote"
+  company_id:                ObjectId → Company (required)
+  posted_by_recuriter_id:    ObjectId → User (required)
+  is_active:                 Boolean (default: true)
+  created_at:                Date (auto)
+}
+```
+
+### Application (recruiter + jobseeker services)
+```
+Application {
+  job_id:           ObjectId → Job
+  applicant_id:     ObjectId → User
+  applicant_email:  String (required)
+  status:           "Submitted" | "Rejected" | "Hired" (default: "Submitted")
+  resume:           String (Cloudinary URL, required)
+  subscribed:       Boolean (default: false — used for priority sort)
+  applied_at:       Date (auto)
+
+  UNIQUE INDEX: (job_id, applicant_id) — prevents duplicate applications
+}
+```
+
+### BlackList (auth + jobseeker + recruiter services)
+```
+BlackList {
+  token:      String (the raw JWT)
+  expiresAt:  Date (TTL for cleanup)
+}
+```
+
+### InterviewReport (interviewReport service)
+```
+InterviewReport {
+  applicant_id:        ObjectId
+  title:               String (job title, required)
+  resume:              String (extracted text)
+  selfDescription:     String
+  jobDescription:      String (required)
+  matchScore:          Number (0–100)
+  technicalQuestions:  [{ question, intention, answer }]
+  behavioralQuestions: [{ question, intention, answer }]
+  skillGaps:           [{ skill, severity: "low"|"medium"|"high" }]
+  preparationPlan:     [{ day, focus, tasks: [String] }]
+  createdAt / updatedAt: Date (auto, Mongoose timestamps)
+}
+```
+
+---
+
+## 📡 API Reference
+
+### Authentication Service — `http://localhost:5000`
+
+| Method | Endpoint | Auth | Body / Notes |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | — | `name, email, password, phoneNumber, role, bio` + optional `file` (resume, required for jobseeker). Sends OTP email. |
+| `POST` | `/api/auth/verify` | — | `{ email, otp }` — verifies OTP (10 min TTL), returns JWT + user |
+| `POST` | `/api/auth/login` | — | `{ email, password }` — returns JWT + user |
+| `POST` | `/api/auth/logout` | Bearer JWT | Blacklists the token |
+
+### Jobseeker / User Service — `http://localhost:5002`
+
+| Method | Endpoint | Auth | Notes |
+|---|---|---|---|
+| `GET` | `/api/user/me` | Bearer JWT | Returns logged-in user's profile |
+| `GET` | `/api/user/:userId` | Bearer JWT | Public profile of any user |
+| `PUT` | `/api/user/update/profile` | Bearer JWT | `{ name, phoneNumber, bio }` |
+| `PUT` | `/api/user/update/pic` | Bearer JWT | Multipart file — replaces profile picture on Cloudinary |
+| `PUT` | `/api/user/update/resume` | Bearer JWT | Multipart file — replaces resume on Cloudinary |
+| `POST` | `/api/user/skill/add` | Bearer JWT | `{ skillName }` |
+| `PUT` | `/api/user/skill/delete` | Bearer JWT | `{ skillName }` |
+| `POST` | `/api/user/apply/job` | Bearer JWT (jobseeker only) | `{ job_id }` — requires stored resume |
+| `GET` | `/api/user/application/all` | Bearer JWT | Returns all applications with job details via aggregate |
+
+### Recruiter / Job Service — `http://localhost:5003`
+
+| Method | Endpoint | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/job/company/new` | Bearer JWT (recruiter) | Multipart: `name, description, website` + logo file |
+| `DELETE` | `/api/job/company/:companyId` | Bearer JWT (recruiter) | Cascades: deletes all jobs + applications |
+| `GET` | `/api/job/company/all` | Bearer JWT (recruiter) | All companies owned by recruiter |
+| `GET` | `/api/job/company/:id` | — | Company details + all its jobs (public) |
+| `POST` | `/api/job/new` | Bearer JWT (recruiter) | `{ title, description, salary, location, role, job_type, work_location, company_id, openings }` |
+| `PUT` | `/api/job/:jobId` | Bearer JWT (recruiter) | Update any job field including `is_active` |
+| `GET` | `/api/job/all` | — | All active jobs, supports `?title=&location=` regex filters |
+| `GET` | `/api/job/:jobId` | — | Single job detail |
+| `GET` | `/api/job/application/:jobId` | Bearer JWT (recruiter) | All applicants, sorted by subscription then apply date |
+| `PUT` | `/api/job/application/update/:id` | Bearer JWT (recruiter) | `{ status: "Hired"|"Rejected" }` — triggers Kafka email event |
+
+### Utils / AI Service — `http://localhost:5001`
+
+| Method | Endpoint | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/utils/upload` | — (internal) | `{ buffer, public_id? }` — uploads/replaces file on Cloudinary. Returns `{ url, public_id }` |
+| `POST` | `/api/utils/career` | — | `{ skills }` — returns structured JSON: summary, job options, skills to learn, learning approach |
+| `POST` | `/api/utils/resume-analyser` | — | `{ pdfBase64 }` — returns ATS score, breakdown by 4 dimensions, suggestions, strengths, summary |
+
+### Interview Report Service — `http://localhost:3000`
+
+| Method | Endpoint | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/interview` | Bearer JWT | Multipart: `resume` PDF file + `{ jobDescription, selfDescription }`. Parses PDF, calls Gemini, saves + returns report |
+| `GET` | `/api/interview` | Bearer JWT | All reports for logged-in user (summary only, no full text fields) |
+| `GET` | `/api/interview/:interviewId` | Bearer JWT | Full report by ID |
+| `GET` | `/api/interview/resume/pdf/:interviewReportId` | Bearer JWT | Generates and streams a tailored PDF resume via Puppeteer |
+
+---
+
+## 🖥 Frontend Pages & Routing
+
+All routes are declared in `App.jsx`. Role-based guards are applied via the `ProtectedRoute` component.
+
+| Route | Page | Access |
 |---|---|---|
-| **Node.js** | v18+ | [Download](https://nodejs.org/) |
-| **npm** | v9+ | Comes with Node.js |
-| **Apache Kafka** | 3.x | Local or [Confluent Cloud](https://confluent.io/) |
-| **Redis** | 7.x | Local or [Redis Cloud](https://redis.com/try-free/) |
-| **MongoDB Atlas** | Cloud | [Sign up free](https://www.mongodb.com/cloud/atlas) |
-| **Cloudinary** | Account | [Sign up free](https://cloudinary.com/) |
-| **Google Gemini API Key** | — | [Get key](https://ai.google.dev/) |
+| `/` | Home | Public |
+| `/login` | Login | Public |
+| `/register` | Register | Public |
+| `/verify` | OTP Verification | Public |
+| `/jobs` | Job Listings | Public |
+| `/jobs/:jobId` | Job Detail | Public |
+| `/company/:companyId` | Company Detail + Jobs | Public |
+| `/dashboard` | User Dashboard | Auth (any role) |
+| `/profile` | Profile Management | Auth (any role) |
+| `/applications` | My Applications | Auth (jobseeker only) |
+| `/users/:userId` | Public User Profile | Auth (any role) |
+| `/interview` | Interview Studio — create new report | Auth (jobseeker only) |
+| `/interview/:id` | Interview Report Viewer | Auth (jobseeker only) |
+| `/tools/career` | Career Advisor | Auth (any role) |
+| `/tools/resume` | ATS Resume Analyzer | Auth (any role) |
+| `/recruiter/companies` | Company List | Auth (recruiter only) |
+| `/recruiter/companies/new` | Create Company | Auth (recruiter only) |
+| `/recruiter/jobs` | My Job Listings | Auth (recruiter only) |
+| `/recruiter/jobs/new` | Create Job | Auth (recruiter only) |
+| `/recruiter/jobs/:jobId/edit` | Edit Job | Auth (recruiter only) |
+| `/recruiter/applications` | All Applications per Job | Auth (recruiter only) |
+| `*` | 404 Not Found | Public |
 
-> **Quick Kafka + Redis setup (Linux/Mac):**
-> ```bash
-> # Start Zookeeper + Kafka
-> bin/zookeeper-server-start.sh config/zookeeper.properties &
-> bin/kafka-server-start.sh config/server.properties &
->
-> # Start Redis
-> redis-server
-> ```
-
----
-
-### Installation
-
-**1. Clone the repository**
-```bash
-git clone https://github.com/Mahendra-9569/HireConnect.git
-cd HireConnect
-```
-
-**2. Install all service dependencies**
-```bash
-# Frontend
-cd frontend && npm install && cd ..
-
-# Auth service
-cd services/authentication && npm install && cd ../..
-
-# Jobseeker service
-cd services/jobseeker && npm install && cd ../..
-
-# Recruiter service
-cd services/recruiter && npm install && cd ../..
-
-# GeminiResponse/Utils service
-cd services/geminiResponse && npm install && cd ../..
-
-# InterviewReport service
-cd services/interviewReport && npm install && cd ../..
-```
+### Route Guard Logic (`ProtectedRoute.jsx`)
+1. If `loading` → show spinner
+2. If not authenticated → redirect to `/login` (preserving `from` location in state)
+3. If `roles` array is provided and user's role is not in it → redirect to `/dashboard`
+4. Otherwise → render children
 
 ---
 
-### Environment Variables
+## 🔐 Authentication & Security Flow
 
-#### 🔐 `services/authentication/.env`
-```env
-PORT=5000
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.xxxx.mongodb.net/hireheaven
-JWT_SEC=your_long_random_jwt_secret
-REDIS_URL=redis://localhost:6379
-KAFKA_BROKER=localhost:9092
-UPLOAD_SERVICE=http://localhost:5001
-FRONTEND_URL=http://localhost:5173
+### Registration Flow
+```
+User submits form
+  → Auth Service validates fields
+  → If jobseeker: file buffer forwarded to Utils Service → Cloudinary URL stored
+  → Password bcrypt-hashed (rounds: 10)
+  → 6-digit OTP generated, hashed not stored (stored plaintext with 10 min TTL)
+  → User doc created (isVerified: false)
+  → Nodemailer sends OTP via Gmail SMTP
+  → Frontend redirected to /verify
 ```
 
-#### 👤 `services/jobseeker/.env`
-```env
-PORT=5002
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.xxxx.mongodb.net/hireheaven
-JWT_SEC=your_long_random_jwt_secret
-UPLOAD_SERVICE=http://localhost:5001
+### OTP Verification Flow
+```
+User submits email + OTP
+  → Auth Service queries: { email, otp, otpExpires: { $gt: now } }
+  → On match: isVerified=true, otp=null, otpExpires=null
+  → JWT signed (payload: { id: user._id }, expiry: 15 days)
+  → Token + serialized user returned to frontend
+  → Frontend saves to localStorage under 'hireheaven.token' / 'hireheaven.user'
 ```
 
-#### 🏢 `services/recruiter/.env`
-```env
-PORT=5003
-MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.xxxx.mongodb.net
-MONGODB_DB=hireheaven
-JWT_SEC=your_long_random_jwt_secret
-KAFKA_BROKER=localhost:9092
-UPLOAD_SERVICE=http://localhost:5001
-CLOUD_NAME=your_cloudinary_cloud_name
-API_KEY=your_cloudinary_api_key
-API_SECRET=your_cloudinary_api_secret
+### Login Flow
+```
+User submits email + password
+  → Auth Service fetches user
+  → Checks isVerified
+  → bcrypt.compare(plain, hashed)
+  → JWT signed and returned
 ```
 
-#### 🤖 `services/geminiResponse/.env`
-```env
-PORT=5001
-KAFKA_BROKER=localhost:9092
-CLOUD_NAME=your_cloudinary_cloud_name
-API_KEY=your_cloudinary_api_key
-API_SECRET=your_cloudinary_api_secret
-SMTP_USER=your_gmail@gmail.com
-SMTP_PASS=your_gmail_app_password
-API_KEY_GEMINI=your_google_gemini_api_key
+### Logout Flow (Token Blacklisting)
+```
+User clicks logout
+  → Frontend calls POST /api/auth/logout with Bearer token
+  → Auth Service decodes token for expiry time
+  → Token inserted into BlackList collection with TTL
+  → All subsequent requests with this token rejected at middleware level
+  → Frontend clears localStorage
 ```
 
-> ⚠️ `SMTP_PASS` must be a **Gmail App Password** — enable 2FA on Google account, then generate one at [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords).
-
-#### 📋 `services/interviewReport/.env`
-```env
-PORT=3000
-MONGO_URI=mongodb+srv://<user>:<password>@cluster0.xxxx.mongodb.net/hireheaven
-JWT_SECRET=your_long_random_jwt_secret
-GOOGLE_GENAI_API_KEY=your_google_gemini_api_key
-CLOUDINARY_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_SECRET_KEY=your_cloudinary_api_secret
-FRONTEND_URL=http://localhost:5173
+### JWT Middleware (jobseeker + recruiter services)
+```
+Request arrives
+  → Extract token from Authorization header (Bearer <token>)
+  → jwt.verify(token, JWT_SEC) → decoded payload
+  → Check BlackList collection — if found → 401 Unauthorized
+  → Fetch user from DB → attach to req.user
+  → next()
 ```
 
-#### 🌐 `frontend/.env`
+---
+
+## 🤖 AI Features Deep Dive
+
+### 1. Interview Report Generator (Interview Report Service — Port 3000)
+
+**Input:** Resume PDF (file upload) + Job Description text + optional Self Description  
+**Process:**
+1. `pdf-parse` extracts text from the uploaded PDF buffer
+2. Constructs a prompt with resume text + self description + job description
+3. Calls `gemini-3-flash-preview` with:
+   - `responseMimeType: "application/json"`
+   - Zod schema compiled to JSON Schema via `zod-to-json-schema` for structured output enforcement
+4. Parses response and stores in MongoDB
+
+**Output Schema (Zod enforced):**
+```
+{
+  matchScore:          number (0-100)
+  title:               string (job title)
+  technicalQuestions:  [{ question, intention, answer }]
+  behavioralQuestions: [{ question, intention, answer }]
+  skillGaps:           [{ skill, severity: "low"|"medium"|"high" }]
+  preparationPlan:     [{ day, focus, tasks: string[] }]
+}
+```
+
+### 2. AI-Generated Resume PDF (Interview Report Service — Port 3000)
+
+**Input:** Existing interview report ID  
+**Process:**
+1. Loads report from MongoDB
+2. Sends resume text + job description + self description to `gemini-3-flash-preview`
+3. Gemini returns JSON `{ html: "..." }` — a fully styled, ATS-friendly HTML resume
+4. Puppeteer launches headless Chromium, sets the HTML content, generates A4 PDF (20mm/15mm margins)
+5. PDF buffer streamed to client as `application/pdf`
+
+### 3. Career Path Advisor (Utils Service — Port 5001)
+
+**Input:** Comma-separated skills string  
+**Process:** Calls `gemini-2.5-flash` with a detailed structured prompt  
+**Output JSON:**
+```
+{
+  summary:        string
+  jobOptions:     [{ title, responsibilities, why }]
+  skillsToLearn:  [{ category, skills: [{ title, why, how }] }]
+  learningApproach: { title, points: string[] }
+}
+```
+
+### 4. ATS Resume Analyzer (Utils Service — Port 5001)
+
+**Input:** PDF as base64 string  
+**Process:** Sends PDF as `inlineData` to `gemini-2.5-flash` with a vision-capable multipart prompt  
+**Output JSON:**
+```
+{
+  atsScore:       number
+  scoreBreakdown: {
+    formatting:   { score, feedback }
+    keywords:     { score, feedback }
+    structure:    { score, feedback }
+    readability:  { score, feedback }
+  }
+  suggestions: [{ category, issue, recommendation, priority: "high"|"medium"|"low" }]
+  strengths:   string[]
+  summary:     string
+}
+```
+
+---
+
+## ⚙️ Environment Variables
+
+### Frontend — `frontend/.env`
 ```env
 VITE_AUTH_API=http://localhost:5000
 VITE_USER_API=http://localhost:5002
@@ -472,451 +616,205 @@ VITE_INTERVIEW_API=http://localhost:3000
 VITE_UTILS_API=http://localhost:5001
 ```
 
-> ⚠️ **Security:** Never commit `.env` files. Ensure `.env` is in `.gitignore` for every service.
+### Authentication Service — `services/authentication/.env`
+```env
+PORT=5000
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/MicroservicesDB
+JWT_SEC=<your_jwt_secret>
+UPLOAD_SERVICE=http://localhost:5001
+FRONTEND_URL=http://localhost:5173
+SMTP_USER=<gmail_address>
+SMTP_PASS=<gmail_app_password>
+```
+
+### Jobseeker Service — `services/jobseeker/.env`
+```env
+PORT=5002
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net
+MONGODB_DB=MicroservicesDB
+JWT_SEC=<your_jwt_secret>
+UPLOAD_SERVICE=http://localhost:5001
+```
+
+### Recruiter Service — `services/recruiter/.env`
+```env
+PORT=5003
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net
+MONGODB_DB=MicroservicesDB
+JWT_SEC=<your_jwt_secret>
+UPLOAD_SERVICE=http://localhost:5001
+CLOUD_NAME=<cloudinary_cloud_name>
+API_KEY=<cloudinary_api_key>
+API_SECRET=<cloudinary_api_secret>
+```
+
+### Utils / Gemini Service — `services/geminiResponse/.env`
+```env
+PORT=5001
+CLOUD_NAME=<cloudinary_cloud_name>
+API_KEY=<cloudinary_api_key>
+API_SECRET=<cloudinary_api_secret>
+API_KEY_GEMINI=<google_gemini_api_key>
+SMTP_USER=<gmail_address>
+SMTP_PASS=<gmail_app_password>
+```
+
+### Interview Report Service — `services/interviewReport/.env`
+```env
+PORT=3000
+FRONTEND_URL=http://localhost:5173
+MONGO_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/MicroservicesDB
+JWT_SECRET=<your_jwt_secret>
+GOOGLE_GENAI_API_KEY=<google_gemini_api_key>
+CLOUDINARY_NAME=<cloudinary_cloud_name>
+CLOUDINARY_API_KEY=<cloudinary_api_key>
+CLOUDINARY_SECRET_KEY=<cloudinary_api_secret>
+COOKIE_EXPIRE=7
+JWT_EXPIRE=7d
+SMTP_SERVICE=gmail
+SMTP_MAIL=<gmail_address>
+SMTP_PASSWORD=<gmail_app_password>
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+```
+
+> ⚠️ **Security Note:** The `.env` files in this repository contain real credentials for development. Before pushing to a public repository or deploying, rotate all secrets (JWT keys, Cloudinary credentials, Gmail app passwords, Google API keys, MongoDB passwords).
 
 ---
 
-### Running All Services
+## 🚀 Getting Started
 
-You need **6 terminal windows** to run the full platform:
+### Prerequisites
 
-| Terminal | Command | Port |
-|---|---|---|
-| 1 — Frontend | `cd frontend && npm run dev` | 5173 |
-| 2 — Auth Service | `cd services/authentication && npm run dev` | 5000 |
-| 3 — Jobseeker Service | `cd services/jobseeker && npm run dev` | 5002 |
-| 4 — Recruiter Service | `cd services/recruiter && npm run dev` | 5003 |
-| 5 — Utils/Gemini/Mail | `cd services/geminiResponse && npm run dev` | 5001 |
-| 6 — Interview Service | `cd services/interviewReport && node server.js` | 3000 |
+- Node.js v18+
+- npm v9+
+- MongoDB Atlas account (or local MongoDB instance)
+- Cloudinary account
+- Google Gemini API key
+- Gmail account with an App Password (not your regular password — enable 2FA first)
+- Apache Kafka (for email notifications; optional for basic setup)
 
-> Ensure **Kafka** and **Redis** are running locally before starting any backend service.
+### Installation & Running
 
----
+Each service and the frontend must be started independently. Open a separate terminal for each.
 
-## 📡 API Reference
-
-### Authentication Service — Base: `http://localhost:5000`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/api/auth/register` | ❌ | Register; sends OTP via Kafka |
-| `POST` | `/api/auth/verify` | ❌ | Verify OTP; issues JWT |
-| `POST` | `/api/auth/login` | ❌ | Login; returns token + user |
-| `POST` | `/api/auth/forgot` | ❌ | Send password reset link |
-| `POST` | `/api/auth/reset/:token` | ❌ | Reset password using token |
-| `POST` | `/api/auth/logout` | ✅ | Blacklists current JWT |
-
-**Register — Jobseeker** (`multipart/form-data`)
-```
-name=John Doe, email=john@example.com, password=Pass@1234,
-phoneNumber=9876543210, role=jobseeker, bio=..., resume=<PDF file>
+**1. Frontend**
+```bash
+cd frontend
+npm install
+npm run dev
+# Runs at http://localhost:5173
 ```
 
-**Register — Recruiter** (`application/json`)
-```json
-{ "name": "Jane HR", "email": "jane@co.com", "password": "Pass@1234", "phoneNumber": "9876543210", "role": "recruiter" }
-```
-
-**Verify OTP**
-```json
-{ "email": "john@example.com", "otp": "482901" }
-// Response: { "token": "<jwt>", "user": { ... } }
-```
-
----
-
-### Jobseeker Service — Base: `http://localhost:5002`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `GET` | `/api/user/me` | ✅ | Get my profile |
-| `GET` | `/api/user/:userId` | ✅ | Get public profile |
-| `PUT` | `/api/user/update/profile` | ✅ | Update name, phone, bio |
-| `PUT` | `/api/user/update/pic` | ✅ | Update profile picture (multipart) |
-| `PUT` | `/api/user/update/resume` | ✅ | Update resume PDF (multipart) |
-| `POST` | `/api/user/skill/add` | ✅ | Add a skill |
-| `PUT` | `/api/user/skill/delete` | ✅ | Remove a skill |
-| `POST` | `/api/user/apply/job` | ✅ | Apply for a job |
-| `GET` | `/api/user/application/all` | ✅ | Get all my applications |
-
----
-
-### Recruiter Service — Base: `http://localhost:5003`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/api/job/company/new` | ✅ (recruiter) | Create company + logo |
-| `DELETE` | `/api/job/company/:companyId` | ✅ (recruiter) | Delete company + cascade |
-| `GET` | `/api/job/company/all` | ✅ | Get my companies |
-| `GET` | `/api/job/company/:id` | ❌ | Company details + jobs |
-| `POST` | `/api/job/new` | ✅ (recruiter) | Post a job |
-| `PUT` | `/api/job/:jobId` | ✅ (recruiter) | Update job |
-| `GET` | `/api/job/all` | ❌ | All active jobs (`?title=&location=`) |
-| `GET` | `/api/job/:jobId` | ❌ | Single job |
-| `GET` | `/api/job/application/:jobId` | ✅ (recruiter) | Applications for a job |
-| `PUT` | `/api/job/application/update/:id` | ✅ (recruiter) | Update application status |
-
----
-
-### Utils / Gemini Service — Base: `http://localhost:5001`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/api/utils/upload` | ❌ (internal) | Upload buffer to Cloudinary |
-| `POST` | `/api/utils/career` | ❌ | AI career path advisor |
-| `POST` | `/api/utils/resume-analyser` | ❌ | ATS resume analysis |
-
----
-
-### Interview Report Service — Base: `http://localhost:3000`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/api/interview/` | ✅ | Generate interview report |
-| `GET` | `/api/interview/` | ✅ | Get all my reports |
-| `GET` | `/api/interview/:interviewId` | ✅ | Get single report |
-| `GET` | `/api/interview/resume/pdf/:id` | ✅ | Download AI resume PDF |
-
----
-
-## 🗄️ Database Schemas
-
-### User Schema
-```js
-{
-  name, email (unique+indexed), password (bcrypt),
-  phone_number, role: ["jobseeker"|"recruiter"], bio,
-  resume (Cloudinary URL), resume_public_id,
-  profile_pic (Cloudinary URL), profile_pic_public_id,
-  subscription (Date — premium expiry),
-  skills: [String],
-  isVerified: Boolean,
-  otp: String (temporary), otpExpires: Date,
-  created_at: Date
-}
-```
-
-### Company Schema
-```js
-{
-  name (unique+indexed), description, website,
-  logo (Cloudinary URL), logo_public_id,
-  recruiter_id: ObjectId (ref: User)
-}
-```
-
-### Job Schema
-```js
-{
-  title, description, salary, location,
-  job_type, openings, role, work_location,
-  company_id: ObjectId (ref: Company),
-  posted_by_recuriter_id: ObjectId (ref: User),
-  is_active: Boolean (default: true),
-  created_at: Date
-}
-```
-
-### Application Schema
-```js
-{
-  job_id: ObjectId, applicant_id: ObjectId,     // unique compound index
-  applicant_email: String,
-  status: ["Submitted"|"Rejected"|"Hired"],
-  resume: String (Cloudinary URL at apply time),
-  subscribed: Boolean,
-  applied_at: Date
-}
-```
-
-### Interview Report Schema
-```js
-{
-  applicant_id: ObjectId,
-  title: String,
-  jobDescription, resume (PDF text), selfDescription,
-  matchScore: Number (0-100),
-  technicalQuestions: [{ question, intention, answer }],
-  behavioralQuestions: [{ question, intention, answer }],
-  skillGaps: [{ skill, severity: "low"|"medium"|"high" }],
-  preparationPlan: [{ day, focus, tasks: [String] }],
-  createdAt, updatedAt
-}
-```
-
-### Blacklist Schema (logout token store)
-```js
-{ token: String, expiresAt: Date }   // TTL: 15 days
-```
-
----
-
-## 🔐 Authentication & Security Flow
-
-### Registration + OTP Verification
-```
-POST /auth/register → validate → bcrypt hash password (10 rounds)
-→ generate 6-digit OTP + 10-min expiry
-→ if jobseeker: upload resume PDF to Cloudinary via utils service
-→ create User (isVerified: false)
-→ publishToTopic("send-mail", { to, subject, OTP html }) → Kafka
-→ Kafka consumer (geminiResponse) → Nodemailer → Gmail SMTP → email sent
-
-POST /auth/verify → match OTP + expiry
-→ isVerified: true, otp: null
-→ issue JWT (15d) → return to client
-```
-
-### Password Reset Flow
-```
-POST /auth/forgot → create reset JWT { email, type:"reset" } (15min)
-→ Redis SET forgot:<email> <token> EX 900
-→ Kafka → email with reset link
-
-POST /auth/reset/:token →
-  a. jwt.verify → check type === "reset"
-  b. redis.get("forgot:<email>") must match token (prevents replay)
-  c. update password hash → redis.del("forgot:<email>")
-```
-
-### Secure Logout (True Invalidation)
-```
-POST /auth/logout → extract JWT from header/cookie
-→ BlackList.create({ token, expiresAt: now + 15 days })
-→ Auth middleware checks blacklist on every request
-→ Blacklisted tokens are permanently rejected until TTL
-```
-
----
-
-## 🤖 AI Features Deep Dive
-
-### 1. Interview Report — Zod Schema Enforcement
-The most complex AI feature uses **Gemini 3 Flash** with **Zod schema as responseSchema** guaranteeing structured JSON output:
-
-```
-User uploads PDF resume + self-description + job description
-  → pdf-parse extracts resume text
-  → Prompt + Zod schema sent to Gemini 3 Flash (responseMimeType: "application/json")
-  → Guaranteed structured response:
-     { matchScore, title, technicalQuestions[], behavioralQuestions[], skillGaps[], preparationPlan[] }
-  → Saved to MongoDB → returned to frontend
-```
-
-### 2. AI Resume PDF Generation (Puppeteer)
-```
-Fetch saved InterviewReport (resume + jobDescription + selfDescription)
-  → Gemini 3 Flash: "Generate ATS-friendly HTML resume tailored to this job"
-  → Puppeteer: page.setContent(html) → page.pdf({ format: "A4" })
-  → PDF binary returned as file download
-```
-
-### 3. ATS Resume Analyzer (Multimodal Gemini)
-```
-Frontend: PDF → FileReader → base64 string
-  → POST /api/utils/resume-analyser { pdfBase64 }
-  → Gemini 2.5 Flash reads PDF inline (inlineData mimeType)
-  → Returns: { atsScore, scoreBreakdown: { formatting, keywords, structure, readability }, suggestions[], strengths[] }
-```
-
-### 4. AI Career Advisor
-```
-User enters skills → POST /api/utils/career { skills: "React, Node.js, Docker" }
-  → Gemini 2.5 Flash generates:
-     { summary, jobOptions[], skillsToLearn[], learningApproach }
-```
-
----
-
-## 📬 Event-Driven Email System (Kafka)
-
-The platform uses Apache Kafka to fully decouple email sending from business logic:
-
-```
-Producers                                       Consumer (geminiResponse service)
-────────────────────────────────────────        ─────────────────────────────────
-auth: Registration OTP email       ─────────►  consumer.subscribe("send-mail")
-auth: Forgot password reset link   ─────────►  Parse JSON { to, subject, html }
-recruiter: Application status update ──────►   Nodemailer createTransport (Gmail, port 465)
-                                               transporter.sendMail(...)
-```
-
-**Why Kafka for email?**
-- SMTP is slow and can fail; making it async means APIs respond instantly
-- SMTP credentials (`SMTP_USER`, `SMTP_PASS`) live in only one service
-- Adding more consumers (analytics, push notifications) requires zero changes to producer code
-- The auth service auto-creates the `send-mail` topic on startup via Kafka admin if it doesn't exist
-
----
-
-## 🎨 Key Design Patterns
-
-### TryCatch Wrapper
-All controllers use a higher-order function eliminating repetitive try/catch blocks:
-```js
-export const TryCatch = (fn) => async (req, res, next) => {
-  try { await fn(req, res, next); }
-  catch (error) { next(error); }
-};
-```
-
-### Serialize Helpers
-Each service whitelists returned fields to prevent leaking OTP, password, or Cloudinary public_ids:
-```js
-serializeUser(user)    
-serializeJob(job)      
-serializeCompany(co)   
-```
-
-### File Upload Proxy
-All file uploads flow through the utils service — other services convert the file to a base64 buffer and POST to `/api/utils/upload`, keeping Cloudinary SDK in one place.
-
-### Subscription-Based Prioritization
-Applications from subscribed users appear at the top of recruiter views:
-```js
-Application.find({ job_id }).sort({ subscribed: -1, applied_at: 1 })
-```
-
-### 5 Axios Instances (Frontend)
-One Axios instance per service, each with the correct base URL and `withCredentials: true`. JWT injected via `authHeaders()` helper using `localStorage`.
-
----
-
-## 🐳 Docker Support
-
-Each service has its own `Dockerfile`. To build and run a service:
+**2. Authentication Service**
 ```bash
 cd services/authentication
-docker build -t hireconnect-auth .
-docker run -p 5000:5000 --env-file .env hireconnect-auth
+npm install
+npm run dev
+# Runs at http://localhost:5000
 ```
-A `docker-compose.yml` at the root (planned) will orchestrate all services + Kafka + Zookeeper + Redis.
 
----
-## 🗺️ Frontend Routing & Pages
-| Route | Component | Auth | Role |
-|---|---|---|---|
-| `/` | Home | ❌ | — |
-| `/login` | LoginPage | ❌ | — |
-| `/register` | RegisterPage | ❌ | — |
-| `/verify` | VerifyPage | ❌ | — |
-| `/forgot-password` | ForgotPasswordPage | ❌ | — |
-| `/reset/:token` | ResetPasswordPage | ❌ | — |
-| `/jobs` | JobsPage | ❌ | — |
-| `/jobs/:jobId` | JobDetailsPage | ❌ | — |
-| `/company/:companyId` | CompanyDetailsPage | ❌ | — |
-| `/dashboard` | DashboardPage | ✅ | Any |
-| `/profile` | ProfilePage | ✅ | Any |
-| `/applications` | ApplicationsPage | ✅ | jobseeker |
-| `/users/:userId` | PublicUserProfilePage | ✅ | Any |
-| `/interview` | InterviewStudioPage | ✅ | jobseeker |
-| `/interview/:id` | InterviewReportPage | ✅ | jobseeker |
-| `/tools/career` | CareerToolsPage | ✅ | Any |
-| `/tools/resume` | ResumeAnalyzerPage | ✅ | Any |
-| `/recruiter/companies` | RecruiterCompaniesPage | ✅ | recruiter |
-| `/recruiter/companies/new` | CreateCompanyPage | ✅ | recruiter |
-| `/recruiter/jobs` | RecruiterJobsPage | ✅ | recruiter |
-| `/recruiter/jobs/new` | CreateJobPage | ✅ | recruiter |
-| `/recruiter/jobs/:jobId/edit` | EditJobPage | ✅ | recruiter |
-| `/recruiter/applications` | RecruiterApplicationsPage | ✅ | recruiter |
-| `*` | NotFound | ❌ | — |
-
----
-
-## ☁️ Deployment Guide
-
-### Recommended Platforms
-| Component | Platform |
-|---|---|
-| Frontend | Vercel or Netlify |
-| Backend services | Render, Railway, or Fly.io |
-| Interview service | Render (supports Puppeteer) |
-| MongoDB | MongoDB Atlas |
-| Redis | Redis Cloud or Upstash |
-| Kafka | Confluent Cloud (free tier) |
-
-### Frontend (Vercel)
-1. Connect GitHub repo → set build command `npm run build`, output dir `dist`
-2. Add all `VITE_*` env vars pointing to deployed service URLs
-
-### Backend Services (Render)
-1. Create a Web Service per microservice
-2. Root directory: `services/<service-name>`
-3. Build: `npm install` | Start: `node index.js` (or `node server.js`)
-4. Add all `.env` variables in the Render dashboard
-
-### Puppeteer on Render
+**3. Jobseeker Service**
 ```bash
-# Add to package.json scripts or build command:
-PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false npm install
+cd services/jobseeker
+npm install
+npm run dev
+# Runs at http://localhost:5002
 ```
-Or use `@sparticuz/chromium` for serverless environments.
 
-### Kafka on Confluent Cloud
-Update KafkaJS config to use SASL authentication with Confluent bootstrap URL, API key, and secret.
+**4. Recruiter Service**
+```bash
+cd services/recruiter
+npm install
+npm run dev
+# Runs at http://localhost:5003
+```
 
----
+**5. Utils / Gemini Service**
+```bash
+cd services/geminiResponse
+npm install
+npm run dev
+# Runs at http://localhost:5001
+```
 
-## 🤝 Contributing
+**6. Interview Report Service**
+```bash
+cd services/interviewReport
+npm install
+npm run dev
+# Runs at http://localhost:3000
+```
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit: `git commit -m "feat: add your feature"`
-4. Push: `git push origin feature/your-feature`
-5. Open a Pull Request
+> The Utils service (port 5001) must be running before Auth, Jobseeker, or Recruiter services — they all call it for file uploads.
 
-**Commit Convention** ([Conventional Commits](https://www.conventionalcommits.org/)):
-`feat:` | `fix:` | `docs:` | `refactor:` | `chore:`
-
----
-## 🐛 Known Issues & Roadmap
-
-### Current Limitations
-- No `docker-compose.yml` for one-command local startup
-- Subscription/payment logic scaffolded but Stripe not integrated
-- Interview service uses CommonJS while others use ESM
-- No admin panel / super admin role
-- Kafka SASL not configured (local plaintext only)
-
-### Planned Features
-- [ ] `docker-compose.yml` with all services + Kafka + Redis + Zookeeper
-- [ ] Stripe subscription payment integration
-- [ ] Real-time notifications (Socket.io or SSE)
-- [ ] Admin dashboard for platform analytics
-- [ ] Unified ESM across all services
-- [ ] Interview video recording + AI evaluation
-- [ ] Mobile app (React Native)
+### Quick Checklist
+- [ ] All 6 `.env` files configured with real credentials
+- [ ] MongoDB Atlas cluster accessible from your IP (check Network Access)
+- [ ] Cloudinary account created, cloud name / API key / secret copied
+- [ ] Google Gemini API key enabled for `generativelanguage.googleapis.com`
+- [ ] Gmail App Password generated (not your account password)
+- [ ] Utils service (5001) started first
 
 ---
 
-## 📄 License
+## 🐳 Deployment Notes
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+Each service has a `Dockerfile`. The services use a standard pattern:
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE <port>
+CMD ["node", "index.js"]
+```
+
+For production deployment:
+- All `MONGODB_URI` / `UPLOAD_SERVICE` / `FRONTEND_URL` values must be updated to production URLs
+- Kafka broker address must be updated in the Recruiter service's `producer.js`
+- The Interview Report service's Puppeteer may need `--no-sandbox` args in containerized environments:
+  ```js
+  puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+  ```
+- Set `CORS` origins explicitly per service (currently uses env var `FRONTEND_URL`)
 
 ---
 
-## 👨‍💻 Author
+## 🗺 Known Issues & Roadmap
 
-**Mahendra Yadav**
+### Known Issues
+- **Mixed module systems:** The `interviewReport` service uses CommonJS (`require`/`module.exports`) while all other services use ES Modules (`import`/`export`). This is functional but inconsistent.
+- **JWT secret mismatch:** The `interviewReport` service reads `JWT_SECRET` while other services read `JWT_SEC`. Ensure they are set to the same value.
+- **Kafka is optional:** If Kafka is not running, the recruiter service logs a warning but continues to function; application status emails simply won't be sent.
+- **No rate limiting:** Auth endpoints (login, register) have no rate limiting, making them susceptible to brute force.
+- **OTP stored as plaintext:** The OTP in the database is not hashed; it should be hashed for production.
+- **Subscription field unused in UI:** The `subscription` date field exists in the User schema and is used for application sort priority, but there is no payment/subscription management UI or API.
 
-[![GitHub](https://img.shields.io/badge/GitHub-Mahendra--9569-181717?style=flat-square&logo=github)](https://github.com/Mahendra-9569)
+### Roadmap / Potential Improvements
+- [ ] Add Docker Compose for one-command local startup
+- [ ] Unify module system to ES Modules across all services
+- [ ] Add Redis for OTP storage with TTL (removing OTP fields from User schema)
+- [ ] Rate limiting on auth endpoints (express-rate-limit)
+- [ ] Hash OTPs before storing
+- [ ] Add Kafka consumer in Utils service for async email delivery
+- [ ] Subscription/payment flow with Razorpay or Stripe
+- [ ] Centralized API gateway (Nginx or custom Express proxy)
+- [ ] Unified logging with Winston or Pino
+- [ ] End-to-end tests with Jest + Supertest
 
 ---
 
-## 🙏 Acknowledgements
+## 👤 Author
 
-- [Apache Kafka + KafkaJS](https://kafka.js.org/) — Event-driven messaging
-- [Google Gemini AI](https://ai.google.dev/) — Generative AI (2.5 Flash + 3 Flash)
-- [Zod](https://zod.dev/) — Schema validation for structured AI output
-- [Puppeteer](https://pptr.dev/) — Headless Chrome PDF generation
-- [Cloudinary](https://cloudinary.com/) — Media CDN
-- [Redis](https://redis.io/) — In-memory token store
-- [Nodemailer](https://nodemailer.com/) — SMTP email delivery
-- [Tailwind CSS](https://tailwindcss.com/) — Utility-first styling
+**Mahendra Yadav**  
+GitHub: [@Mahendra-9569](https://github.com/Mahendra-9569)
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ on a true microservices architecture — scalable, modular, and AI-powered.</p>
-  <p>⭐ If this project helped you, please give it a star!</p>
+Made with ❤️ using React, Node.js, MongoDB, Google Gemini, and Kafka
 </div>
