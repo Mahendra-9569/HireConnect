@@ -816,5 +816,5 @@ GitHub: [@Mahendra-9569](https://github.com/Mahendra-9569)
 ---
 
 <div align="center">
-Made with ❤️ using React, Node.js, MongoDB, Google Gemini, and Kafka
+Made with ❤️ using React, Node.js, MongoDB, Google Gemini.
 </div>
