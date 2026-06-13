@@ -45,11 +45,11 @@ export const registerUser = TryCatch(async (req, res) => {
 
         const buffer = getBuffer(req.file);
 
-        // 🛠️ FIX 1: Wrap external API call to pinpoint microservice issues
+       
         try {
             const { data } = await axios.post(
                 `${process.env.UPLOAD_SERVICE}/api/utils/upload`,
-                { buffer } // Verify if your upload service expects { buffer } or FormData!
+                { buffer } 
             );
             userData.resume = data.url;
             userData.resume_public_id = data.public_id;
@@ -181,9 +181,7 @@ export const loginUser = TryCatch(async (req, res) => {
 });
 
 
-
 export const logoutUser = TryCatch(async (req, res) => {
-
     const token =
         req.headers.authorization?.split(" ")[1]
         || req.cookies?.token;
@@ -210,6 +208,7 @@ export const logoutUser = TryCatch(async (req, res) => {
         console.log(err);
     }
 
+    
     await Blacklist.updateOne(
         { token },
         {
@@ -221,9 +220,15 @@ export const logoutUser = TryCatch(async (req, res) => {
         { upsert: true }
     );
 
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+
+  
     res.json({
         success: true,
         message: "Logout successful"
     });
-
 });
